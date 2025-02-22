@@ -1,1 +1,92 @@
+import dash
+from dash import dcc, html
+import plotly.express as px
+import pandas as pd
 
+# Sample data
+data = {
+    'Country': ['USA', 'USA', 'USA', 'India', 'India', 'India', 'China', 'China', 'China'],
+    'Year': [2000, 2010, 2020, 2000, 2010, 2020, 2000, 2010, 2020],
+    'GDP per Capita': [36630, 48454, 63851, 400, 1400, 2100, 800, 4000, 10600],
+    'Life Expectancy': [77, 78, 79, 63, 66, 69, 72, 75, 78],
+}
+
+df = pd.DataFrame(data)
+
+# Create the Dash app
+app = dash.Dash(__name__)
+
+# Create the figure for GDP per capita over time
+fig_gdp = px.line(df, x='Year', y='GDP per Capita', color='Country', markers=True,
+                  title="GDP per Capita Over Time by Country",
+                  labels={'GDP per Capita': 'GDP per Capita (USD)', 'Year': 'Year'},
+                  line_shape='spline',  # Smooth lines
+                  template='plotly_dark')  # Dark theme for an elegant look
+
+# Create the figure for Life Expectancy over time
+fig_life_expectancy = px.line(df, x='Year', y='Life Expectancy', color='Country', markers=True,
+                              title="Life Expectancy Over Time by Country",
+                              labels={'Life Expectancy': 'Life Expectancy (Years)', 'Year': 'Year'},
+                              line_shape='spline',
+                              template='plotly_dark')
+
+# Customize the look of the figures
+fig_gdp.update_layout(
+    title_font_size=26,
+    title_x=0.5,
+    plot_bgcolor="#333333",  # Dark background for the plot
+    paper_bgcolor="#333333",
+    font=dict(family="Segoe UI, sans-serif", size=14, color="#f0f0f0"),
+    hoverlabel=dict(bgcolor="black", font_size=12, font_family="Arial", font_color="white")  # Tooltip style
+)
+
+fig_life_expectancy.update_layout(
+    title_font_size=26,
+    title_x=0.5,
+    plot_bgcolor="#333333",
+    paper_bgcolor="#333333",
+    font=dict(family="Segoe UI, sans-serif", size=14, color="#f0f0f0"),
+    hoverlabel=dict(bgcolor="black", font_size=12, font_family="Arial", font_color="white")
+)
+
+# Layout of the app
+app.layout = html.Div(style={'fontFamily': 'Segoe UI, sans-serif', 'backgroundColor': '#1E1E1E'}, children=[
+    # Header section with logo and title
+    html.Div([
+        html.H1("Global Metrics Dashboard", style={
+            'textAlign': 'center', 'color': 'white', 'fontSize': '35px', 'padding': '20px', 'fontWeight': 'bold'}),
+    ], style={'backgroundColor': '#2A3F5F', 'padding': '20px'}),
+
+    # Main content section with cards and graphs
+    html.Div([
+        # Graph for GDP per capita
+        html.Div([
+            html.Div([
+                dcc.Graph(
+                    id='gdp-graph',
+                    figure=fig_gdp
+                ),
+            ], style={'margin': '10px', 'borderRadius': '15px', 'backgroundColor': '#444444', 'boxShadow': '0px 4px 10px rgba(0, 0, 0, 0.3)'}),
+        ], className="six columns", style={'padding': '10px', 'marginBottom': '20px'}),
+
+        # Graph for Life Expectancy
+        html.Div([
+            html.Div([
+                dcc.Graph(
+                    id='life-expectancy-graph',
+                    figure=fig_life_expectancy
+                ),
+            ], style={'margin': '10px', 'borderRadius': '15px', 'backgroundColor': '#444444', 'boxShadow': '0px 4px 10px rgba(0, 0, 0, 0.3)'}),
+        ], className="six columns", style={'padding': '10px', 'marginBottom': '20px'}),
+    ], style={'display': 'flex', 'flexWrap': 'wrap', 'justifyContent': 'space-between', 'padding': '30px', 'gap': '30px'}),
+
+    # Footer section with additional links or info
+    html.Div([
+        html.P("Developed with love by Nandita Roy", style={
+            'textAlign': 'center', 'color': '#ffffff', 'fontSize': '14px', 'padding': '20px', 'fontStyle': 'italic'})
+    ], style={'backgroundColor': '#2A3F5F'})
+])
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
+#http://127.0.0.1:8050/
