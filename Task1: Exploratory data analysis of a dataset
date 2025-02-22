@@ -1,1 +1,71 @@
+# Importing libraries
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objects as go
+import ipywidgets as widgets
+from IPython.display import display
+
+# Load the diamonds dataset from Seaborn
+diamonds = sns.load_dataset('diamonds')
+
+# 1. Basic Overview of the Data
+print(diamonds.info())  # Check data types and null values
+print(diamonds.head())  # Display the first few rows of the dataset
+
+# 2. Descriptive Statistics
+print(diamonds.describe())  # Summary statistics for numerical columns
+
+# 3. Checking for missing values
+print(diamonds.isnull().sum())  # Check for missing values in each column
+
+# 4. Interactive Distribution of Price
+price_fig = px.histogram(diamonds, x='price', nbins=50, title='Distribution of Diamond Price', marginal="box")
+price_fig.update_layout(xaxis_title="Price", yaxis_title="Frequency")
+price_fig.show()
+
+# 5. Interactive Boxplot of Price vs. Cut (categorical vs. continuous)
+cut_boxplot = px.box(diamonds, x='cut', y='price', color='cut', title="Price vs Cut")
+cut_boxplot.update_layout(xaxis_title="Cut", yaxis_title="Price")
+cut_boxplot.show()
+
+# 6. Interactive Correlation Heatmap of Numerical Variables
+corr_matrix = diamonds.corr()
+fig = go.Figure(data=go.Heatmap(z=corr_matrix.values,
+                                x=corr_matrix.columns,
+                                y=corr_matrix.columns,
+                                colorscale='RdBu', 
+                                colorbar=dict(title='Correlation Coefficient')))
+fig.update_layout(title='Correlation Heatmap of Numerical Features')
+fig.show()
+
+# 7. Interactive Scatter Plot between Carat and Price
+scatter_fig = px.scatter(diamonds, x='carat', y='price', color='cut', title="Carat vs Price", 
+                         labels={'carat': 'Carat', 'price': 'Price'})
+scatter_fig.show()
+
+# 8. Interactive Count Plot of Different Cuts
+cut_count = px.bar(diamonds['cut'].value_counts().reset_index(), x='index', y='cut', 
+                   title='Count of Diamonds by Cut', labels={'index': 'Cut', 'cut': 'Count'})
+cut_count.show()
+
+# 9. Interactive Pairplot (with sliders to control what features to plot)
+def update_pairplot(selected_columns):
+    sns.pairplot(diamonds[selected_columns])
+    plt.show()
+
+# Creating a dropdown widget to select which columns to plot in the pairplot
+dropdown = widgets.Dropdown(
+    options=[['carat', 'depth', 'table', 'price'], ['carat', 'price', 'cut']],
+    value=['carat', 'depth', 'table', 'price'],
+    description='Columns to plot:',
+)
+
+widgets.interactive(update_pairplot, selected_columns=dropdown)
+
+# 10. 3D Scatter Plot between Carat, Price, and Depth
+scatter_3d_fig = px.scatter_3d(diamonds, x='carat', y='price', z='depth', color='cut', 
+                                title='3D Scatter Plot: Carat, Price, Depth')
+scatter_3d_fig.show()
 
